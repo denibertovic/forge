@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 
-module Lib where
+module Forge.Lib where
 
 
 import           Control.Exception          (try)
@@ -26,6 +26,8 @@ import           System.Environment         (lookupEnv, setEnv)
 import           System.Exit                (ExitCode (..), die, exitWith)
 import           System.Posix.User          (getRealUserID)
 
+import           Forge.Gitlab
+
 data ForgeCommand = CreateVariable Environment VarKey VarValue
                   | UpdateVariable Environment VarKey VarValue
                   | DeleteVariable Environment VarKey
@@ -37,7 +39,6 @@ data ForgeOpts = ForgeOpts {
                  , debug          :: Bool
                  , cmd            :: ForgeCommand}
 
-newtype AccessToken = AccessToken String deriving (Eq, Show)
 newtype Environment = Environment String deriving (Eq, Show)
 newtype VarKey = VarKey String deriving (Eq, Show)
 newtype VarValue = VarValue String deriving (Eq, Show)
@@ -82,17 +83,6 @@ cmds = subparser (cmdCreateVariable <> cmdUpdateVariable <> cmdDeleteVariable)
 forgeOpts :: Env -> Parser ForgeOpts
 forgeOpts env = ForgeOpts <$> configPathOpt <*> (groupOpt env) <*> (projectOpt env) <*> debugOpt <*> cmds
 
-data ForgeConfig = ForgeConfig { accessToken :: AccessToken } deriving (Eq, Show)
-
-instance FromJSON ForgeConfig where
-  parseJSON (Object o) = do
-    accessToken <- o .: "accessToken"
-    return $ ForgeConfig $ AccessToken accessToken
-  parseJSON _ = fail "Expected Object for Config value"
-
-decodeConfig :: FilePath -> IO (Either Y.ParseException ForgeConfig)
-decodeConfig p = Y.decodeFileEither p
-
 entrypoint :: ForgeOpts -> IO ()
 entrypoint (ForgeOpts config group project debug cmd) = do
   c' <- readConfig config
@@ -110,15 +100,6 @@ readKey v = Just $ VarKey v
 
 readVal :: String -> Maybe VarValue
 readVal v = Just $ VarValue v
-
-readConfig :: FilePath -> IO (ForgeConfig)
-readConfig p = do
-  exists <- doesFileExist p
-  when (not exists) (die "Config file does not exist.")
-  c <- decodeConfig p
-  case c of
-    Left err -> die (show err)
-    Right c  -> return c
 
 envOpt = option (maybeReader readEnv) (
        long "environment"

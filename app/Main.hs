@@ -2,7 +2,7 @@ module Main where
 
 import           Data.Yaml           (decodeFile)
 import qualified Data.Yaml           as Y
-import           Lib
+import           Forge.Lib
 
 import           Data.Semigroup      ((<>))
 import qualified Data.Text           as T

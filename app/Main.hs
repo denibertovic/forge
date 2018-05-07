@@ -17,6 +17,6 @@ main = do
   where
     opts env = info (helper <*> forgeOpts env)
       ( fullDesc
-     <> progDesc "Helper for working with Gitlab secret variables."
-     <> header "forge - A helper tool for working with Gitlab secret variables." )
+     <> progDesc "Helper for working with various APIs."
+     <> header "forge - A helper tool for with various APIs." )
 

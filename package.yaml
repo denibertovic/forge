@@ -32,6 +32,7 @@ dependencies:
 - http-client
 - http-client-tls
 - http-conduit
+- pretty-simple
 
 library:
   source-dirs: src

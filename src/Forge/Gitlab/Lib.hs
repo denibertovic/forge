@@ -6,6 +6,7 @@ module Forge.Gitlab.Lib where
 
 import           Control.Exception          (try)
 import           Control.Monad              (when)
+import qualified Data.Aeson                 as JSON
 import qualified Data.ByteString.Char8      as C8
 import qualified Data.ByteString.Lazy.Char8 as L8
 import           Data.Monoid                ((<>))
@@ -13,10 +14,12 @@ import           Data.Yaml                  (decodeFileEither)
 import qualified Data.Yaml                  as Y
 import           Network.HTTP.Client
 import           Network.HTTP.Client.TLS
-import           Network.HTTP.Simple        (getResponseBody, setRequestHeader)
+import           Network.HTTP.Simple        (getResponseBody, setRequestHeader,
+                                             setRequestQueryString)
 import           Network.HTTP.Types.Status  (statusCode)
 import           System.Directory           (doesFileExist, makeAbsolute)
 import           System.Exit                (die)
+import           Text.Pretty.Simple         (pPrint)
 
 import           Forge.Gitlab.Options
 import           Forge.Gitlab.Types
@@ -41,6 +44,7 @@ entrypoint (GitlabOpts config cmd) = do
     CreateVariable g p e k v -> createVariable token g p e k v
     UpdateVariable g p e k v -> updateVariable token g p e k v
     DeleteVariable g p e k   -> deleteVariable token g p e k
+    ListProjects             -> listProjects token
 
 createVariable :: AccessToken -> Group -> Project ->  Environment -> VarKey -> VarValue -> IO ()
 createVariable t (Group g) (Project p) (Environment e) (VarKey k) (VarValue v) = do
@@ -75,6 +79,19 @@ deleteVariable t (Group g) (Project p) (Environment e) (VarKey k) = do
   initialRequest <- mkInitRequest url t method
   ret <- execRequest initialRequest Nothing
   print ret
+
+listProjects :: AccessToken -> IO ()
+listProjects t = do
+  let url = Url $ "https://gitlab.com/api/v4/projects"
+  let method = "GET"
+  initialRequest <- mkInitRequest url t method
+  let req = setRequestQueryString [("membership", Just "true")] $ initialRequest
+  ret <- execRequest req Nothing
+  case (JSON.eitherDecode' ret :: Either String [ProjectDetails]) of
+    Left err ->
+        die (show err)
+    Right ps ->
+        pPrint ps
 
 execRequest :: Request -> Maybe [(C8.ByteString, C8.ByteString)] -> IO (L8.ByteString)
 execRequest r pairs = do

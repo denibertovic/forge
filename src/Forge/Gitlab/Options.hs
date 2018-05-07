@@ -14,6 +14,7 @@ import           Forge.Gitlab.Types
 data GitlabCommand = CreateVariable Group Project Environment VarKey VarValue
                   | UpdateVariable Group Project Environment VarKey VarValue
                   | DeleteVariable Group Project Environment VarKey
+                  | ListProjects
 
 data GitlabOpts = GitlabOpts {
                    configFilePath :: FilePath
@@ -44,7 +45,7 @@ configPathOpt = strOption
         <> metavar "path"
         <> help "absolute path to the config file" )
 
-gitlabCmds env = subparser (cmdCreateVariable env <> cmdUpdateVariable env <> cmdDeleteVariable env)
+gitlabCmds env = subparser (cmdCreateVariable env <> cmdUpdateVariable env <> cmdDeleteVariable env <> cmdListProjects env)
 
 gitlabOpts :: Env -> Parser GitlabOpts
 gitlabOpts env = GitlabOpts <$> configPathOpt <*> gitlabCmds env
@@ -80,19 +81,24 @@ valueOpt = option (maybeReader readVal) (
        long "value"
        <> short 'v'
        <> metavar "VALUE"
-       <> help "Value of the variable.")
+       <> help "Value of the variable")
 
 cmdCreateVariable env = command "create-var" infos
     where infos = info (options <**> helper) desc
-          desc = progDesc "Create gitlab variable."
+          desc = progDesc "Create gitlab variable"
           options = CreateVariable <$> groupOpt env <*> projectOpt env <*> envOpt <*> keyOpt <*> valueOpt
 
 cmdUpdateVariable env = command "update-var" infos
     where infos = info (options <**> helper) desc
-          desc = progDesc "Create gitlab variable."
+          desc = progDesc "Create gitlab variable"
           options = UpdateVariable <$> groupOpt env <*> projectOpt env <*> envOpt <*> keyOpt <*> valueOpt
 
 cmdDeleteVariable env = command "delete-var" infos
     where infos = info (options <**> helper) desc
-          desc = progDesc "Delete gitlab variable."
+          desc = progDesc "Delete gitlab variable"
           options = DeleteVariable <$> groupOpt env <*> projectOpt env <*> envOpt <*> keyOpt
+
+cmdListProjects env = command "list-projects" infos
+    where infos = info (options <**> helper) desc
+          desc = progDesc "List Gitlab projects"
+          options = pure ListProjects

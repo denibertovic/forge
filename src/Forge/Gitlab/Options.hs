@@ -5,41 +5,35 @@ module Forge.Gitlab.Options where
 
 
 import           Control.Monad       (join)
+import           Data.Maybe          (fromJust)
 import           Data.Semigroup      ((<>))
 import           Options.Applicative
 
 import           Forge.Gitlab.Types
 
-data GitlabCommand = CreateVariable Environment VarKey VarValue
-                  | UpdateVariable Environment VarKey VarValue
-                  | DeleteVariable Environment VarKey
+data GitlabCommand = CreateVariable Group Project Environment VarKey VarValue
+                  | UpdateVariable Group Project Environment VarKey VarValue
+                  | DeleteVariable Group Project Environment VarKey
 
 data GitlabOpts = GitlabOpts {
                    configFilePath :: FilePath
-                 , group          :: String
-                 , project        :: String
                  , cmd            :: GitlabCommand}
 
 type Env = [(String, String)]
 
-environ :: (HasValue f) => String -> Env -> Mod f String
-environ k env = maybe idm value . join $ parse <$> lookup k env
-  where
-    parse = either (const Nothing) Just . Right
+environ :: (Show a, HasValue f) => (String -> Maybe a) -> String -> Env -> Mod f a
+environ r k env = maybe idm value $ r =<< lookup k env
 
-textOption :: Mod OptionFields String -> Parser String
-textOption = option (eitherReader (Right))
-
-groupOpt env = textOption
+groupOpt env = option (maybeReader readGroup)
         ( long "group"
-        <> environ "GITLAB_GROUP" env
+        <> environ readGroup "GITLAB_GROUP" env
         <> short 'g'
         <> metavar "GITLAB_GROUP"
         <> help "Gitlab Group." )
 
-projectOpt env = textOption
+projectOpt env = option (maybeReader readProject)
         ( long "project"
-        <> environ "GITLAB_PROJECT" env
+        <> environ readProject "GITLAB_PROJECT" env
         <> short 'p'
         <> metavar "GITLAB_PROJECT"
         <> help "Gitlab Project." )
@@ -50,10 +44,16 @@ configPathOpt = strOption
         <> metavar "path"
         <> help "absolute path to the config file." )
 
-gitlabCmds = subparser (cmdCreateVariable <> cmdUpdateVariable <> cmdDeleteVariable)
+gitlabCmds env = subparser (cmdCreateVariable env <> cmdUpdateVariable env <> cmdDeleteVariable env)
 
 gitlabOpts :: Env -> Parser GitlabOpts
-gitlabOpts env = GitlabOpts <$> configPathOpt <*> (groupOpt env) <*> (projectOpt env) <*> gitlabCmds
+gitlabOpts env = GitlabOpts <$> configPathOpt <*> gitlabCmds env
+
+readGroup :: String -> Maybe Group
+readGroup v = Just $ Group v
+
+readProject :: String -> Maybe Project
+readProject v = Just $ Project v
 
 readEnv :: String -> Maybe Environment
 readEnv v = Just $ Environment v
@@ -82,17 +82,17 @@ valueOpt = option (maybeReader readVal) (
        <> metavar "VALUE"
        <> help "Value of the variable.")
 
-cmdCreateVariable = command "create-var" infos
+cmdCreateVariable env = command "create-var" infos
     where infos = info (options <**> helper) desc
           desc = progDesc "Create gitlab variable."
-          options = CreateVariable <$> envOpt <*> keyOpt <*> valueOpt
+          options = CreateVariable <$> groupOpt env <*> projectOpt env <*> envOpt <*> keyOpt <*> valueOpt
 
-cmdUpdateVariable = command "update-var" infos
+cmdUpdateVariable env = command "update-var" infos
     where infos = info (options <**> helper) desc
           desc = progDesc "Create gitlab variable."
-          options = UpdateVariable <$> envOpt <*> keyOpt <*> valueOpt
+          options = UpdateVariable <$> groupOpt env <*> projectOpt env <*> envOpt <*> keyOpt <*> valueOpt
 
-cmdDeleteVariable = command "delete-var" infos
+cmdDeleteVariable env = command "delete-var" infos
     where infos = info (options <**> helper) desc
           desc = progDesc "Delete gitlab variable."
-          options = DeleteVariable <$> envOpt <*> keyOpt
+          options = DeleteVariable <$> groupOpt env <*> projectOpt env <*> envOpt <*> keyOpt

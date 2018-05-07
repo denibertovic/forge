@@ -34,16 +34,16 @@ readConfig p = do
     Right c  -> return c
 
 entrypoint :: GitlabOpts -> IO ()
-entrypoint (GitlabOpts config group project cmd) = do
+entrypoint (GitlabOpts config cmd) = do
   c' <- readConfig config
   let token = accessToken c'
   case cmd of
-    CreateVariable e k v -> createVariable token group project e k v
-    UpdateVariable e k v -> updateVariable token group project e k v
-    DeleteVariable e k   -> deleteVariable token group project e k
+    CreateVariable g p e k v -> createVariable token g p e k v
+    UpdateVariable g p e k v -> updateVariable token g p e k v
+    DeleteVariable g p e k   -> deleteVariable token g p e k
 
-createVariable :: AccessToken -> String -> String ->  Environment -> VarKey -> VarValue -> IO ()
-createVariable t g p (Environment e) (VarKey k) (VarValue v) = do
+createVariable :: AccessToken -> Group -> Project ->  Environment -> VarKey -> VarValue -> IO ()
+createVariable t (Group g) (Project p) (Environment e) (VarKey k) (VarValue v) = do
   let url = Url $ "https://gitlab.com/api/v4/projects/" <> g <> "%2F" <> p <> "/variables/"
   let method = "POST"
   let pairs =
@@ -55,8 +55,8 @@ createVariable t g p (Environment e) (VarKey k) (VarValue v) = do
   ret <- execRequest initialRequest (Just pairs)
   print ret
 
-updateVariable :: AccessToken -> String -> String -> Environment -> VarKey -> VarValue -> IO ()
-updateVariable t g p (Environment e) (VarKey k) (VarValue v) = do
+updateVariable :: AccessToken -> Group -> Project -> Environment -> VarKey -> VarValue -> IO ()
+updateVariable t (Group g) (Project p) (Environment e) (VarKey k) (VarValue v) = do
   let url = Url $ "https://gitlab.com/api/v4/projects/" <> g <> "%2F" <> p <> "/variables/" <> k
   let method = "PUT"
   let pairs =
@@ -68,8 +68,8 @@ updateVariable t g p (Environment e) (VarKey k) (VarValue v) = do
   print ret
 
 -- TODO: Add environment scope here once the API supports it
-deleteVariable :: AccessToken -> String -> String -> Environment -> VarKey -> IO ()
-deleteVariable t g p (Environment e) (VarKey k) = do
+deleteVariable :: AccessToken -> Group -> Project -> Environment -> VarKey -> IO ()
+deleteVariable t (Group g) (Project p) (Environment e) (VarKey k) = do
   let url = Url $ "https://gitlab.com/api/v4/projects/" <> g <> "%2F" <> p <> "/variables/" <> k
   let method = "DELETE"
   initialRequest <- mkInitRequest url t method

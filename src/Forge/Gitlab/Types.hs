@@ -7,6 +7,8 @@ module Forge.Gitlab.Types where
 import           Data.Aeson (FromJSON, Value (..), parseJSON, (.:))
 import qualified Data.Yaml  as Y
 
+newtype Group = Group String deriving (Eq, Show)
+newtype Project = Project String deriving (Eq, Show)
 newtype Environment = Environment String deriving (Eq, Show)
 newtype VarKey = VarKey String deriving (Eq, Show)
 newtype VarValue = VarValue String deriving (Eq, Show)

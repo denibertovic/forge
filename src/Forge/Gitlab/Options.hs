@@ -29,20 +29,20 @@ groupOpt env = option (maybeReader readGroup)
         <> environ readGroup "GITLAB_GROUP" env
         <> short 'g'
         <> metavar "GITLAB_GROUP"
-        <> help "Gitlab Group." )
+        <> help "Gitlab Group" )
 
 projectOpt env = option (maybeReader readProject)
         ( long "project"
         <> environ readProject "GITLAB_PROJECT" env
         <> short 'p'
         <> metavar "GITLAB_PROJECT"
-        <> help "Gitlab Project." )
+        <> help "Gitlab Project" )
 
 configPathOpt = strOption
         ( long "config"
         <> short 'c'
         <> metavar "path"
-        <> help "absolute path to the config file." )
+        <> help "absolute path to the config file" )
 
 gitlabCmds env = subparser (cmdCreateVariable env <> cmdUpdateVariable env <> cmdDeleteVariable env)
 

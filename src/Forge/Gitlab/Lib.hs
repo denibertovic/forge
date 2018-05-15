@@ -45,6 +45,7 @@ entrypoint (GitlabOpts config cmd) = do
     UpdateVariable g p e k v -> updateVariable token g p e k v
     DeleteVariable g p e k   -> deleteVariable token g p e k
     ListProjects             -> listProjects token
+    ListIssues               -> listIssues token
 
 createVariable :: AccessToken -> Group -> Project ->  Environment -> VarKey -> VarValue -> IO ()
 createVariable t (Group g) (Project p) (Environment e) (VarKey k) (VarValue v) = do
@@ -95,6 +96,23 @@ listProjects' t = do
   let req = setRequestQueryString [("membership", Just "true")] $ initialRequest
   ret <- execRequest req
   let decoded = JSON.eitherDecode' ret :: Either String [ProjectDetails]
+  return decoded
+
+listIssues :: AccessToken -> IO ()
+listIssues t = do
+  ret <- listIssues' t
+  case ret of
+    Left err -> die (show err)
+    Right ps -> L8.putStrLn (JSON.encode ps)
+
+listIssues' :: AccessToken -> IO (Either String [IssueDetails])
+listIssues' t = do
+  let url = Url $ "https://gitlab.com/api/v4/issues"
+  let method = "GET"
+  initialRequest <- mkInitRequest url t method
+  let req = setRequestQueryString [("scope", Just "assigned-to-me"), ("state", Just "opened")] $ initialRequest
+  ret <- execRequest req
+  let decoded = JSON.eitherDecode' ret :: Either String [IssueDetails]
   return decoded
 
 execRequest :: Request -> IO (L8.ByteString)

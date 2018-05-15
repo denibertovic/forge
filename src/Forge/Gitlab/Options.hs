@@ -15,6 +15,7 @@ data GitlabCommand = CreateVariable Group Project Environment VarKey VarValue
                   | UpdateVariable Group Project Environment VarKey VarValue
                   | DeleteVariable Group Project Environment VarKey
                   | ListProjects
+                  | ListIssues
 
 data GitlabOpts = GitlabOpts {
                    configFilePath :: FilePath
@@ -45,7 +46,7 @@ configPathOpt = strOption
         <> metavar "path"
         <> help "absolute path to the config file" )
 
-gitlabCmds env = subparser (cmdCreateVariable env <> cmdUpdateVariable env <> cmdDeleteVariable env <> cmdListProjects env)
+gitlabCmds env = subparser (cmdCreateVariable env <> cmdUpdateVariable env <> cmdDeleteVariable env <> cmdListProjects env <> cmdListIssues env)
 
 gitlabOpts :: Env -> Parser GitlabOpts
 gitlabOpts env = GitlabOpts <$> configPathOpt <*> gitlabCmds env
@@ -102,3 +103,8 @@ cmdListProjects env = command "list-projects" infos
     where infos = info (options <**> helper) desc
           desc = progDesc "List Gitlab projects"
           options = pure ListProjects
+
+cmdListIssues env = command "list-issues" infos
+    where infos = info (options <**> helper) desc
+          desc = progDesc "List Gitlab issues"
+          options = pure ListIssues

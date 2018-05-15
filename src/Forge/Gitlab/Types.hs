@@ -4,7 +4,8 @@
 module Forge.Gitlab.Types where
 
 
-import           Data.Aeson (FromJSON, Value (..), parseJSON, (.:))
+import           Data.Aeson (FromJSON, ToJSON, Value (..), object, parseJSON,
+                             toJSON, (.:), (.=))
 import qualified Data.Aeson as JSON
 import           Data.Text  as T
 import qualified Data.Yaml  as Y
@@ -22,6 +23,9 @@ data GitlabConfig = GitlabConfig { accessToken :: AccessToken } deriving (Eq, Sh
 instance FromJSON Url where
   parseJSON (JSON.String s) = return $ Url $ T.unpack s
   parseJSON _               = fail "Expected String for Url"
+
+instance ToJSON Url where
+  toJSON (Url s) = toJSON s
 
 instance FromJSON GitlabConfig where
   parseJSON (Object o) = do
@@ -42,3 +46,10 @@ instance FromJSON ProjectDetails where
     projectUrl <- o .: "web_url"
     return $ ProjectDetails {..}
   parseJSON _ = fail "Expected Object for ProjectDetails value"
+
+instance ToJSON ProjectDetails where
+  toJSON (ProjectDetails i n u) = object [ "id" .= i
+                                         , "path_with_namespace" .= n
+                                         , "web_url" .= toJSON u
+                                         ]
+

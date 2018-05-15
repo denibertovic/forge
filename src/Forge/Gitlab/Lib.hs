@@ -56,7 +56,7 @@ createVariable t (Group g) (Project p) (Environment e) (VarKey k) (VarValue v) =
           , ("environment_scope", C8.pack e)
           ]
   initialRequest <- mkInitRequest url t method
-  ret <- execRequest initialRequest (Just pairs)
+  ret <- execRequest (urlEncodedBody pairs initialRequest)
   print ret
 
 updateVariable :: AccessToken -> Group -> Project -> Environment -> VarKey -> VarValue -> IO ()
@@ -68,7 +68,7 @@ updateVariable t (Group g) (Project p) (Environment e) (VarKey k) (VarValue v) =
           , ("environment_scope", C8.pack e)
           ]
   initialRequest <- mkInitRequest url t method
-  ret <- execRequest initialRequest (Just pairs)
+  ret <- execRequest (urlEncodedBody pairs initialRequest)
   print ret
 
 -- TODO: Add environment scope here once the API supports it
@@ -77,28 +77,30 @@ deleteVariable t (Group g) (Project p) (Environment e) (VarKey k) = do
   let url = Url $ "https://gitlab.com/api/v4/projects/" <> g <> "%2F" <> p <> "/variables/" <> k
   let method = "DELETE"
   initialRequest <- mkInitRequest url t method
-  ret <- execRequest initialRequest Nothing
+  ret <- execRequest initialRequest
   print ret
 
 listProjects :: AccessToken -> IO ()
 listProjects t = do
+  ret <- listProjects' t
+  case ret of
+    Left err -> die (show err)
+    Right ps -> L8.putStrLn (JSON.encode ps)
+
+listProjects' :: AccessToken -> IO (Either String [ProjectDetails])
+listProjects' t = do
   let url = Url $ "https://gitlab.com/api/v4/projects"
   let method = "GET"
   initialRequest <- mkInitRequest url t method
   let req = setRequestQueryString [("membership", Just "true")] $ initialRequest
-  ret <- execRequest req Nothing
-  case (JSON.eitherDecode' ret :: Either String [ProjectDetails]) of
-    Left err ->
-        die (show err)
-    Right ps ->
-        pPrint ps
+  ret <- execRequest req
+  let decoded = JSON.eitherDecode' ret :: Either String [ProjectDetails]
+  return decoded
 
-execRequest :: Request -> Maybe [(C8.ByteString, C8.ByteString)] -> IO (L8.ByteString)
-execRequest r pairs = do
+execRequest :: Request -> IO (L8.ByteString)
+execRequest r = do
   manager <- newManager tlsManagerSettings
-  response <- case pairs of
-    Nothing -> try $ httpLbs r manager
-    Just p  -> try $ httpLbs (urlEncodedBody p r) manager
+  response <- try $ httpLbs r manager
   case response of
     Left e         -> die (show (e :: HttpException))
     Right response -> return $ getResponseBody response
@@ -108,4 +110,3 @@ mkInitRequest (Url url) (AccessToken t) m = do
   initialRequest <- parseRequest url
   let request = setRequestHeader "Content-Type" ["application/json"] $ setRequestHeader "PRIVATE-TOKEN" [C8.pack t] $ initialRequest { method = C8.pack m }
   return request
-

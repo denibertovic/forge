@@ -11,26 +11,19 @@ import           Data.Monoid ((<>))
 import           Data.Text   as T
 import qualified Data.Yaml   as Y
 
+import           Forge.Types (AccessToken (..), Url (..))
+
 newtype Group = Group String deriving (Eq, Show)
 newtype Project = Project String deriving (Eq, Show)
 newtype Environment = Environment String deriving (Eq, Show)
 newtype VarKey = VarKey String deriving (Eq, Show)
 newtype VarValue = VarValue String deriving (Eq, Show)
-newtype Url = Url String deriving (Eq, Show)
-newtype AccessToken = AccessToken String deriving (Eq, Show)
 
 data GitlabConfig = GitlabConfig { accessToken :: AccessToken } deriving (Eq, Show)
 
-instance FromJSON Url where
-  parseJSON (JSON.String s) = return $ Url $ T.unpack s
-  parseJSON _               = fail "Expected String for Url"
-
-instance ToJSON Url where
-  toJSON (Url s) = toJSON s
-
 instance FromJSON GitlabConfig where
   parseJSON (Object o) = do
-    accessToken <- o .: "accessToken"
+    accessToken <- o .: "access_token"
     return $ GitlabConfig $ AccessToken accessToken
   parseJSON _ = fail "Expected Object for Config value"
 

@@ -4,37 +4,23 @@
 module Forge.Gitlab.Lib where
 
 
-import           Control.Exception          (try)
-import           Control.Monad              (when)
 import qualified Data.Aeson                 as JSON
 import qualified Data.ByteString.Char8      as C8
 import qualified Data.ByteString.Lazy.Char8 as L8
 import           Data.Monoid                ((<>))
-import           Data.Yaml                  (decodeFileEither)
-import qualified Data.Yaml                  as Y
 import           Network.HTTP.Client
 import           Network.HTTP.Client.TLS
 import           Network.HTTP.Simple        (getResponseBody, setRequestHeader,
                                              setRequestQueryString)
 import           Network.HTTP.Types.Status  (statusCode)
-import           System.Directory           (doesFileExist, makeAbsolute)
 import           System.Exit                (die)
 import           Text.Pretty.Simple         (pPrint)
 
 import           Forge.Gitlab.Options
 import           Forge.Gitlab.Types
-
-decodeConfig :: FilePath -> IO (Either Y.ParseException GitlabConfig)
-decodeConfig p = Y.decodeFileEither p
-
-readConfig :: FilePath -> IO (GitlabConfig)
-readConfig p = do
-  exists <- doesFileExist p
-  when (not exists) (die "Config file does not exist.")
-  c <- decodeConfig p
-  case c of
-    Left err -> die (show err)
-    Right c  -> return c
+import           Forge.HTTP                 (execRequest)
+import           Forge.Types                (AccessToken (..), Url (..))
+import           Forge.Utils                (readConfig)
 
 entrypoint :: GitlabOpts -> IO ()
 entrypoint (GitlabOpts config cmd) = do
@@ -132,14 +118,6 @@ listTodos' t = do
   ret <- execRequest req
   let decoded = JSON.eitherDecode' ret :: Either String [TodoDetails]
   return decoded
-
-execRequest :: Request -> IO (L8.ByteString)
-execRequest r = do
-  manager <- newManager tlsManagerSettings
-  response <- try $ httpLbs r manager
-  case response of
-    Left e         -> die (show (e :: HttpException))
-    Right response -> return $ getResponseBody response
 
 mkInitRequest :: Url -> AccessToken -> String -> IO Request
 mkInitRequest (Url url) (AccessToken t) m = do

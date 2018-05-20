@@ -25,7 +25,7 @@ import           Forge.Utils                (readConfig)
 entrypoint :: GitlabOpts -> IO ()
 entrypoint (GitlabOpts config cmd) = do
   c' <- readConfig config
-  let token = accessToken c'
+  let token = gitlabAccessToken c'
   case cmd of
     CreateVariable g p e k v -> createVariable token g p e k v
     UpdateVariable g p e k v -> updateVariable token g p e k v
@@ -75,14 +75,14 @@ listProjects t = do
     Left err -> die (show err)
     Right ps -> L8.putStrLn (JSON.encode ps)
 
-listProjects' :: AccessToken -> IO (Either String [ProjectDetails])
+listProjects' :: AccessToken -> IO (Either String [GitlabProjectDetails])
 listProjects' t = do
   let url = Url $ "https://gitlab.com/api/v4/projects"
   let method = "GET"
   initialRequest <- mkInitRequest url t method
   let req = setRequestQueryString [("membership", Just "true")] $ initialRequest
   ret <- execRequest req
-  let decoded = JSON.eitherDecode' ret :: Either String [ProjectDetails]
+  let decoded = JSON.eitherDecode' ret :: Either String [GitlabProjectDetails]
   return decoded
 
 listIssues :: AccessToken -> IO ()
@@ -92,14 +92,14 @@ listIssues t = do
     Left err -> die (show err)
     Right ps -> L8.putStrLn (JSON.encode ps)
 
-listIssues' :: AccessToken -> IO (Either String [IssueDetails])
+listIssues' :: AccessToken -> IO (Either String [GitlabIssueDetails])
 listIssues' t = do
   let url = Url $ "https://gitlab.com/api/v4/issues"
   let method = "GET"
   initialRequest <- mkInitRequest url t method
   let req = setRequestQueryString [("scope", Just "assigned-to-me"), ("state", Just "opened")] $ initialRequest
   ret <- execRequest req
-  let decoded = JSON.eitherDecode' ret :: Either String [IssueDetails]
+  let decoded = JSON.eitherDecode' ret :: Either String [GitlabIssueDetails]
   return decoded
 
 listTodos :: AccessToken -> IO ()
@@ -109,14 +109,14 @@ listTodos t = do
     Left err -> die (show err)
     Right ps -> L8.putStrLn (JSON.encode ps)
 
-listTodos' :: AccessToken -> IO (Either String [TodoDetails])
+listTodos' :: AccessToken -> IO (Either String [GitlabTodoDetails])
 listTodos' t = do
   let url = Url $ "https://gitlab.com/api/v4/todos"
   let method = "GET"
   initialRequest <- mkInitRequest url t method
   let req = setRequestQueryString [("state", Just "pending"), ("action", Just "assigned")] $ initialRequest
   ret <- execRequest req
-  let decoded = JSON.eitherDecode' ret :: Either String [TodoDetails]
+  let decoded = JSON.eitherDecode' ret :: Either String [GitlabTodoDetails]
   return decoded
 
 mkInitRequest :: Url -> AccessToken -> String -> IO Request

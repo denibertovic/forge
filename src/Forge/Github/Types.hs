@@ -22,15 +22,15 @@ instance FromJSON GithubConfig where
   parseJSON _ = fail "Expected Object for Config value"
 
 
-data IssueDetails = IssueDetails { issueId           :: Int
-                                 , issueProjectGroup :: String
-                                 , issueProjectName  :: String
-                                 , issueTitle        :: String
-                                 , issueDescription  :: Maybe String
-                                 , issueUrl          :: Url
+data GithubIssueDetails = GithubIssueDetails { githubIssueId :: Int
+                                 , githubIssueGroup          :: String
+                                 , githubIssueProject        :: String
+                                 , githubIssueTitle          :: String
+                                 , githubIssueDescription    :: Maybe String
+                                 , githubIssueUrl            :: Url
                                  } deriving (Eq, Show)
 
-instance FromJSON IssueDetails where
+instance FromJSON GithubIssueDetails where
   parseJSON (Object o) = do
     issueId <- o .: "id"
     issueTitle <- o .: "title"
@@ -39,11 +39,11 @@ instance FromJSON IssueDetails where
     let splits = T.splitOn "/" $ T.pack url
     let groupName = T.unpack $ splits !! 3
     let projectName = T.unpack $ splits !! 4
-    return $ IssueDetails issueId groupName projectName issueTitle issueDescription (Url url)
-  parseJSON _ = fail "Expected Object for IssueDetails value"
+    return $ GithubIssueDetails issueId groupName projectName issueTitle issueDescription (Url url)
+  parseJSON _ = fail "Expected Object for GithubIssueDetails value"
 
-instance ToJSON IssueDetails where
-  toJSON (IssueDetails i g p t d u) = object [ "id" .= i
+instance ToJSON GithubIssueDetails where
+  toJSON (GithubIssueDetails i g p t d u) = object [ "id" .= i
                                        , "group_name" .= g
                                        , "project_name" .= p
                                        , "title" .= t

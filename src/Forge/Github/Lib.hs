@@ -52,12 +52,12 @@ listIssues t = do
     Left err -> die (show err)
     Right ps -> L8.putStrLn (JSON.encode ps)
 
-listIssues' :: AccessToken -> IO (Either String [IssueDetails])
+listIssues' :: AccessToken -> IO (Either String [GithubIssueDetails])
 listIssues' t = do
   let url = Url $ "https://api.github.com/user/issues"
   let method = "GET"
   initialRequest <- mkInitRequest url t method
   let req = setRequestQueryString [("state", Just "open"), ("filter", Just "assigned")] $ initialRequest
   ret <- execRequest req
-  let decoded = JSON.eitherDecode' ret :: Either String [IssueDetails]
+  let decoded = JSON.eitherDecode' ret :: Either String [GithubIssueDetails]
   return decoded

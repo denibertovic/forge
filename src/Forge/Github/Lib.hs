@@ -54,7 +54,7 @@ listIssues t = do
 
 listIssues' :: AccessToken -> IO (Either String [GithubIssueDetails])
 listIssues' t = do
-  let url = Url $ "https://api.github.com/user/issues"
+  let url = Url $ "https://api.github.com/issues"
   let method = "GET"
   initialRequest <- mkInitRequest url t method
   let req = setRequestQueryString [("state", Just "open"), ("filter", Just "assigned")] $ initialRequest

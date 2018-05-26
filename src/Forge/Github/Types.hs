@@ -3,30 +3,30 @@
 
 module Forge.Github.Types where
 
+import           RIO
 
 import           Data.Aeson  (FromJSON, ToJSON, Value (..), object, parseJSON,
                               toJSON, (.:), (.:?), (.=))
-import qualified Data.Aeson  as JSON
-import           Data.Monoid ((<>))
+import           Data.List   ((!!))
 import           Data.Text   as T
-import qualified Data.Yaml   as Y
 
 import           Forge.Types (AccessToken (..), Url (..))
 
-data GithubConfig = GithubConfig { githubAccessToken :: AccessToken} deriving (Eq, Show)
+data GithubConfig = GithubConfig { githubAccessToken :: AccessToken, githubApiUrl :: Url} deriving (Eq, Show)
 
 instance FromJSON GithubConfig where
   parseJSON (Object o) = do
     t <- o .: "access_token"
-    return $ GithubConfig $ AccessToken t
+    u <- o .: "api_url"
+    return $ GithubConfig t u
   parseJSON _ = fail "Expected Object for Config value"
 
 
 data GithubIssueDetails = GithubIssueDetails { githubIssueId :: Int
-                                 , githubIssueGroup          :: String
-                                 , githubIssueProject        :: String
-                                 , githubIssueTitle          :: String
-                                 , githubIssueDescription    :: Maybe String
+                                 , githubIssueGroup          :: T.Text
+                                 , githubIssueProject        :: T.Text
+                                 , githubIssueTitle          :: T.Text
+                                 , githubIssueDescription    :: Maybe T.Text
                                  , githubIssueUrl            :: Url
                                  } deriving (Eq, Show)
 
@@ -36,9 +36,9 @@ instance FromJSON GithubIssueDetails where
     issueTitle <- o .: "title"
     issueDescription <- o .:? "description"
     (Url url) <- o .: "html_url"
-    let splits = T.splitOn "/" $ T.pack url
-    let groupName = T.unpack $ splits !! 3
-    let projectName = T.unpack $ splits !! 4
+    let splits = T.splitOn "/" url
+    let groupName = splits !! 3
+    let projectName = splits !! 4
     return $ GithubIssueDetails issueId groupName projectName issueTitle issueDescription (Url url)
   parseJSON _ = fail "Expected Object for GithubIssueDetails value"
 

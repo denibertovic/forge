@@ -3,17 +3,24 @@
 
 module Forge.Types where
 
+import           RIO
 
-import           Data.Aeson (FromJSON, ToJSON, Value (..), parseJSON, toJSON,
-                             (.:))
+import           Data.Aeson (FromJSON, ToJSON, parseJSON, toJSON)
 import qualified Data.Aeson as JSON
-import           Data.Text  as T
+import qualified RIO.Text   as T
 
-newtype AccessToken = AccessToken String deriving (Eq, Show)
-newtype Url = Url String deriving (Eq, Show)
+newtype AccessToken = AccessToken T.Text deriving (Eq, Show)
+newtype Url = Url T.Text deriving (Eq, Show)
+
+instance FromJSON AccessToken where
+  parseJSON (JSON.String s) = return $ AccessToken s
+  parseJSON _               = fail "Expected String for AccessToken"
+
+instance ToJSON AccessToken where
+  toJSON (AccessToken s) = toJSON s
 
 instance FromJSON Url where
-  parseJSON (JSON.String s) = return $ Url $ T.unpack s
+  parseJSON (JSON.String s) = return $ Url s
   parseJSON _               = fail "Expected String for Url"
 
 instance ToJSON Url where

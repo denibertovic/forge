@@ -4,59 +4,51 @@
 
 module Forge.Github.Lib where
 
+import           RIO
 
-import           Control.Exception          (try)
-import           Control.Monad              (when)
 import qualified Data.Aeson                 as JSON
 import qualified Data.ByteString.Char8      as C8
 import qualified Data.ByteString.Lazy.Char8 as L8
-import           Data.Monoid                ((<>))
-import           Data.Yaml                  (decodeFileEither)
-import qualified Data.Yaml                  as Y
 import           Network.HTTP.Client
-import           Network.HTTP.Client.TLS
-import           Network.HTTP.Simple        (getResponseBody, setRequestHeader,
+import           Network.HTTP.Simple        (setRequestHeader,
                                              setRequestQueryString)
-import           Network.HTTP.Types.Status  (statusCode)
-import           System.Directory           (doesFileExist, makeAbsolute)
+import qualified RIO.Text                   as T
 import           System.Exit                (die)
-import           Text.Pretty.Simple         (pPrint)
 
+import qualified Data.Text.Encoding         as TE
 import           Forge.Github.Options
 import           Forge.Github.Types
 import           Forge.HTTP                 (execRequest)
 import           Forge.Types                (AccessToken (..), Url (..))
-import           Forge.Utils                (readConfig)
+import           Forge.Utils                (addUrlPaths, readConfig)
 
 mkInitRequest :: Url -> AccessToken -> String -> IO Request
 mkInitRequest (Url url) (AccessToken t) m = do
-  initialRequest <- parseRequest url
+  initialRequest <- parseRequest $ T.unpack url
   let request = setRequestHeader "Content-Type" ["application/json"] $
                 setRequestHeader "User-Agent" [C8.pack "haskell http-client"] $
-                setRequestHeader "Authorization" [C8.pack ("token " <> t)] $
+                setRequestHeader "Authorization" [TE.encodeUtf8 ("token " <> t)] $
                 initialRequest { method = C8.pack m }
   return request
 
 entrypoint :: GithubOpts -> IO ()
 entrypoint (GithubOpts config cmd) = do
   c' <- readConfig config
-  let t =  githubAccessToken c'
   case cmd of
-    ListIssues       -> listIssues t
-    ListPullRequests -> print "prs"
+    ListIssues       -> listIssues c'
 
-listIssues :: AccessToken -> IO ()
-listIssues t = do
-  ret <- listIssues' t
+listIssues :: GithubConfig -> IO ()
+listIssues c = do
+  ret <- listIssues' c
   case ret of
     Left err -> die (show err)
     Right ps -> L8.putStrLn (JSON.encode ps)
 
-listIssues' :: AccessToken -> IO (Either String [GithubIssueDetails])
-listIssues' t = do
-  let url = Url $ "https://api.github.com/issues"
+listIssues' :: GithubConfig -> IO (Either String [GithubIssueDetails])
+listIssues' c = do
+  let url = addUrlPaths (githubApiUrl c) ["issues"]
   let method = "GET"
-  initialRequest <- mkInitRequest url t method
+  initialRequest <- mkInitRequest url (githubAccessToken c) method
   let req = setRequestQueryString [("state", Just "open"), ("filter", Just "assigned")] $ initialRequest
   ret <- execRequest req
   let decoded = JSON.eitherDecode' ret :: Either String [GithubIssueDetails]

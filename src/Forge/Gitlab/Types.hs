@@ -3,33 +3,34 @@
 
 module Forge.Gitlab.Types where
 
+import           RIO
 
 import           Data.Aeson  (FromJSON, ToJSON, Value (..), object, parseJSON,
                               toJSON, (.:), (.=))
 import qualified Data.Aeson  as JSON
-import           Data.Monoid ((<>))
-import           Data.Text   as T
-import qualified Data.Yaml   as Y
+import           Data.List   ((!!))
+import qualified Data.Text   as T
 
 import           Forge.Types (AccessToken (..), Url (..))
 
-newtype Group = Group String deriving (Eq, Show)
-newtype Project = Project String deriving (Eq, Show)
-newtype Environment = Environment String deriving (Eq, Show)
-newtype VarKey = VarKey String deriving (Eq, Show)
-newtype VarValue = VarValue String deriving (Eq, Show)
+newtype Group = Group T.Text deriving (Eq, Show)
+newtype Project = Project T.Text deriving (Eq, Show)
+newtype Environment = Environment T.Text deriving (Eq, Show)
+newtype VarKey = VarKey T.Text deriving (Eq, Show)
+newtype VarValue = VarValue T.Text deriving (Eq, Show)
 
-data GitlabConfig = GitlabConfig { gitlabAccessToken :: AccessToken } deriving (Eq, Show)
+data GitlabConfig = GitlabConfig { gitlabAccessToken :: AccessToken, gitlabApiUrl :: Url } deriving (Eq, Show)
 
 instance FromJSON GitlabConfig where
   parseJSON (Object o) = do
-    accessToken <- o .: "access_token"
-    return $ GitlabConfig $ AccessToken accessToken
+    t <- o .: "access_token"
+    u <- o .: "api_url"
+    return $ GitlabConfig t u
   parseJSON _ = fail "Expected Object for Config value"
 
 
 data GitlabProjectDetails = GitlabProjectDetails { gitlabProjectId :: Int
-                                     , gitlabProjectName           :: String
+                                     , gitlabProjectName           :: T.Text
                                      , gitlabProjectUrl            :: Url
                                      } deriving (Eq, Show)
 
@@ -48,10 +49,10 @@ instance ToJSON GitlabProjectDetails where
                                          ]
 
 data GitlabIssueDetails = GitlabIssueDetails { gitlabIssueId :: Int
-                                 , gitlabIsueGroup           :: String
-                                 , gitlabIssueProject        :: String
-                                 , gitlabIssueTitle          :: String
-                                 , gitlabIssueDescription    :: String
+                                 , gitlabIsueGroup           :: T.Text
+                                 , gitlabIssueProject        :: T.Text
+                                 , gitlabIssueTitle          :: T.Text
+                                 , gitlabIssueDescription    :: T.Text
                                  , gitlabIssueUrl            :: Url
                                  } deriving (Eq, Show)
 
@@ -61,9 +62,9 @@ instance FromJSON GitlabIssueDetails where
     issueTitle <- o .: "title"
     issueDescription <- o .: "description"
     (Url url) <- o .: "web_url"
-    let splits = T.splitOn "/" $ T.pack url
-    let groupName = T.unpack $ splits !! 3
-    let projectName = T.unpack $ splits !! 4
+    let splits = T.splitOn "/" url
+    let groupName = splits !! 3
+    let projectName = splits !! 4
     return $ GitlabIssueDetails issueId groupName projectName issueTitle issueDescription (Url url)
   parseJSON _ = fail "Expected Object for GitlabIssueDetails value"
 
@@ -82,7 +83,8 @@ data GitlabTodoType = GitlabTodoIssue | GitlabTodoMergeRequest deriving (Eq, Sho
 instance FromJSON GitlabTodoType where
   parseJSON (JSON.String "Issue")        = return GitlabTodoIssue
   parseJSON (JSON.String "MergeRequest") = return GitlabTodoMergeRequest
-  parseJSON (JSON.String s)              = fail $ "Unkown Todo Type: " <> (T.unpack s)
+  parseJSON (JSON.String s)              = fail $ T.unpack $ "Unkown Todo Type: " <> s
+  parseJSON _              = fail $ T.unpack $ "Invalid value for Todo. Expecting String."
 
 instance ToJSON GitlabTodoType where
   toJSON GitlabTodoIssue        = "Issue"
@@ -90,10 +92,10 @@ instance ToJSON GitlabTodoType where
 
 data GitlabTodoDetails = GitlabTodoDetails { gitlabTodoId :: Int
                                , gitlabTodoType           :: GitlabTodoType
-                               , gitlabTodoGroup          :: String
-                               , gitlabTodoProject        :: String
-                               , gitlabTodoTitle          :: String
-                               , gitlabTodoDescription    :: String
+                               , gitlabTodoGroup          :: T.Text
+                               , gitlabTodoProject        :: T.Text
+                               , gitlabTodoTitle          :: T.Text
+                               , gitlabTodoDescription    :: T.Text
                                , gitlabTodoUrl            :: Url
                                } deriving (Eq, Show)
 
@@ -104,9 +106,9 @@ instance FromJSON GitlabTodoDetails where
     todoTitle <- (o .: "target") >>= (.: "title")
     todoDescription <- (o .: "target") >>= (.: "description")
     (Url url) <- (o .: "target") >>= (.: "web_url")
-    let splits = T.splitOn "/" $ T.pack url
-    let groupName = T.unpack $ splits !! 3
-    let projectName = T.unpack $ splits !! 4
+    let splits = T.splitOn "/" url
+    let groupName = splits !! 3
+    let projectName = splits !! 4
     return $ GitlabTodoDetails todoId todoType groupName projectName todoTitle todoDescription (Url url)
   parseJSON _ = fail "Expected Object for GitlabTodoDetails value"
 

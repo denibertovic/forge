@@ -1,11 +1,10 @@
 module Main where
 
-import           Data.Yaml           (decodeFile)
-import qualified Data.Yaml           as Y
+import           RIO
+
 import           Forge.Lib
 
 import           Data.Semigroup      ((<>))
-import qualified Data.Text           as T
 import           Options.Applicative
 import           System.Environment  (getEnvironment)
 

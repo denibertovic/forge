@@ -19,15 +19,23 @@ extra-source-files:
 # common to point users to the README.md file.
 description:         Please see the README on GitHub at <https://github.com/denibertovic/forge#readme>
 
+ghc-options:
+# - -Werror
+- -Wall
+- -Wcompat
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wredundant-constraints
+
 dependencies:
 - base >= 4.7 && < 5
+- rio
+- text
+- bytestring
 - yaml
 - optparse-applicative
-- text
 - aeson
-- directory
 - unix
-- bytestring
 - http-types
 - http-client
 - http-client-tls
@@ -36,6 +44,9 @@ dependencies:
 
 library:
   source-dirs: src
+
+default-extensions:
+  - NoImplicitPrelude
 
 executables:
   forge:

@@ -113,7 +113,7 @@ listTodos' c = do
   let url = addUrlPaths (gitlabApiUrl c) ["todos"]
   let method = "GET"
   initialRequest <- mkInitRequest url (gitlabAccessToken c) method
-  let req = setRequestQueryString [("state", Just "pending"), ("action", Just "assigned")] $ initialRequest
+  let req = setRequestQueryString [("state", Just "pending")] $ initialRequest
   ret <- execRequest req
   let decoded = JSON.eitherDecode' ret :: Either String [GitlabTodoDetails]
   return decoded

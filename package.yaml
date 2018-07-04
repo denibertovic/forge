@@ -1,5 +1,5 @@
 name:                forge
-version:             0.2.0.0
+version:             0.2.1.0
 github:              "denibertovic/forge"
 license:             BSD3
 author:              "Deni Bertovic"
@@ -36,8 +36,9 @@ dependencies:
 - optparse-applicative
 - aeson
 - unix
-- http-types
 - http-client
+- http-conduit
+- http-types
 - http-client-tls
 - http-conduit
 - pretty-simple

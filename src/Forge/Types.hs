@@ -9,6 +9,8 @@ import           Data.Aeson (FromJSON, ToJSON, parseJSON, toJSON)
 import qualified Data.Aeson as JSON
 import qualified RIO.Text   as T
 
+
+newtype MakefileTemplateName = MakefileTemplateName T.Text deriving (Eq, Show)
 newtype AccessToken = AccessToken T.Text deriving (Eq, Show)
 newtype Url = Url T.Text deriving (Eq, Show)
 

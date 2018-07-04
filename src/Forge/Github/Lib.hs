@@ -1,41 +1,41 @@
-{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PartialTypeSignatures #-}
-{-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Forge.Github.Lib where
 
-import           RIO
+import RIO
 
-import qualified Data.Aeson                 as JSON
-import qualified Data.ByteString.Char8      as C8
+import qualified Data.Aeson as JSON
+import qualified Data.ByteString.Char8 as C8
 import qualified Data.ByteString.Lazy.Char8 as L8
-import           Network.HTTP.Client
-import           Network.HTTP.Simple        (setRequestHeader,
-                                             setRequestQueryString)
-import qualified RIO.Text                   as T
-import           System.Exit                (die)
+import Network.HTTP.Client
+import Network.HTTP.Simple (setRequestHeader, setRequestQueryString)
+import qualified RIO.Text as T
+import System.Exit (die)
 
-import qualified Data.Text.Encoding         as TE
-import           Forge.Github.Options
-import           Forge.Github.Types
-import           Forge.HTTP                 (execRequest)
-import           Forge.Types                (AccessToken (..), Url (..))
-import           Forge.Utils                (addUrlPaths, readConfig)
+import qualified Data.Text.Encoding as TE
+import Forge.Github.Options
+import Forge.Github.Types
+import Forge.HTTP (execRequest)
+import Forge.Types (AccessToken(..), Url(..))
+import Forge.Utils (addUrlPaths, readConfig)
 
 mkInitRequest :: Url -> AccessToken -> String -> IO Request
 mkInitRequest (Url url) (AccessToken t) m = do
   initialRequest <- parseRequest $ T.unpack url
-  let request = setRequestHeader "Content-Type" ["application/json"] $
-                setRequestHeader "User-Agent" [C8.pack "haskell http-client"] $
-                setRequestHeader "Authorization" [TE.encodeUtf8 ("token " <> t)] $
-                initialRequest { method = C8.pack m }
+  let request =
+        setRequestHeader "Content-Type" ["application/json"] $
+        setRequestHeader "User-Agent" [C8.pack "haskell http-client"] $
+        setRequestHeader "Authorization" [TE.encodeUtf8 ("token " <> t)] $
+        initialRequest {method = C8.pack m}
   return request
 
 entrypoint :: GithubOpts -> IO ()
 entrypoint (GithubOpts config cmd) = do
   c' <- readConfig config
   case cmd of
-    ListIssues       -> listIssues c'
+    ListIssues -> listIssues c'
 
 listIssues :: GithubConfig -> IO ()
 listIssues c = do
@@ -49,7 +49,10 @@ listIssues' c = do
   let url = addUrlPaths (githubApiUrl c) ["issues"]
   let method = "GET"
   initialRequest <- mkInitRequest url (githubAccessToken c) method
-  let req = setRequestQueryString [("state", Just "open"), ("filter", Just "assigned")] $ initialRequest
+  let req =
+        setRequestQueryString
+          [("state", Just "open"), ("filter", Just "assigned")] $
+        initialRequest
   ret <- execRequest req
   let decoded = JSON.eitherDecode' ret :: Either String [GithubIssueDetails]
   return decoded

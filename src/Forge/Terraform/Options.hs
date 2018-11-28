@@ -5,7 +5,6 @@ module Forge.Terraform.Options where
 
 import           RIO
 
-import           Data.Semigroup      ((<>))
 import           Options.Applicative
 
 import Forge.Terraform.Types

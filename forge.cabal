@@ -1,0 +1,136 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: b28ba396c4e8c4a8318fa3fcc07bea41c4acfd97da65f6a67a30cbc7e62e1d19
+
+name:           forge
+version:        0.2.2.0
+description:    Please see the README on GitHub at <https://github.com/denibertovic/forge#readme>
+homepage:       https://github.com/denibertovic/forge#readme
+bug-reports:    https://github.com/denibertovic/forge/issues
+author:         Deni Bertovic
+maintainer:     deni@denibertovic.com
+copyright:      2018 Deni Bertovic
+license:        LGPL-3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/denibertovic/forge
+
+library
+  hs-source-dirs:
+      src
+  default-extensions: NoImplicitPrelude
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , conduit
+    , conduit-extra
+    , directory
+    , filemanip
+    , filepath
+    , http-client
+    , http-client-tls
+    , http-conduit
+    , http-types
+    , optparse-applicative
+    , pretty-simple
+    , rio
+    , tar-conduit
+    , text
+    , typed-process
+    , unix
+    , yaml
+  exposed-modules:
+      Forge.Github.Lib
+      Forge.Github.Options
+      Forge.Github.Types
+      Forge.Gitlab.Lib
+      Forge.Gitlab.Options
+      Forge.Gitlab.Types
+      Forge.HTTP
+      Forge.Lib
+      Forge.Options
+      Forge.Terraform.Lib
+      Forge.Terraform.Options
+      Forge.Terraform.Types
+      Forge.Types
+      Forge.Utils
+  other-modules:
+      Paths_forge
+  default-language: Haskell2010
+
+executable forge
+  main-is: Main.hs
+  hs-source-dirs:
+      app
+  default-extensions: NoImplicitPrelude
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , conduit
+    , conduit-extra
+    , directory
+    , filemanip
+    , filepath
+    , forge
+    , http-client
+    , http-client-tls
+    , http-conduit
+    , http-types
+    , optparse-applicative
+    , pretty-simple
+    , rio
+    , tar-conduit
+    , text
+    , typed-process
+    , unix
+    , yaml
+  other-modules:
+      Paths_forge
+  default-language: Haskell2010
+
+test-suite forge-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  hs-source-dirs:
+      test
+  default-extensions: NoImplicitPrelude
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , conduit
+    , conduit-extra
+    , directory
+    , filemanip
+    , filepath
+    , forge
+    , http-client
+    , http-client-tls
+    , http-conduit
+    , http-types
+    , optparse-applicative
+    , pretty-simple
+    , rio
+    , tar-conduit
+    , text
+    , typed-process
+    , unix
+    , yaml
+  other-modules:
+      Paths_forge
+  default-language: Haskell2010

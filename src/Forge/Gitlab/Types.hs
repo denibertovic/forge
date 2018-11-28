@@ -57,7 +57,7 @@ data GitlabIssueDetails = GitlabIssueDetails { gitlabIssueId :: Int
                                  } deriving (Eq, Show)
 
 instance FromJSON GitlabIssueDetails where
-  parseJSON (Object o) = do
+  parseJSON (JSON.Object o) = do
     issueId <- o .: "id"
     issueTitle <- o .: "title"
     issueDescription <- o .: "description"
@@ -105,7 +105,7 @@ instance FromJSON GitlabTodoDetails where
     todoType <- o .: "target_type"
     todoTitle <- (o .: "target") >>= (.: "title")
     todoDescription <- (o .: "target") >>= (.: "description")
-    (Url url) <- (o .: "target") >>= (.: "web_url")
+    (Url url) <- (o .: "target_url")
     let splits = T.splitOn "/" url
     let groupName = splits !! 3
     let projectName = splits !! 4
@@ -119,5 +119,5 @@ instance ToJSON GitlabTodoDetails where
                                        , "title" .= t
                                        , "description" .= d
                                        , "type" .= toJSON ty
-                                       , "web_url" .= toJSON u
+                                       , "url" .= toJSON u
                                        ]

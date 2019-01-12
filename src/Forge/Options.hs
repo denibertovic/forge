@@ -37,7 +37,7 @@ makeOpt =
   optional $
   option (maybeReader readMakefileTemplateName)
     (long "makefile" <> short 'm' <> metavar "NAME" <>
-     help "Makefile template to fetch from github repo.")
+     help "Makefile template to fetch from github repo. Defaults to denibertovic/makefiles.")
 
 cmdFetch :: Env -> Mod CommandFields ForgeCommand
 cmdFetch _ = command "fetch" infos

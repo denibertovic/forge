@@ -10,6 +10,7 @@ import qualified Forge.Gitlab.Lib as Gitlab
 import Forge.HTTP (downloadFile)
 import Forge.Options
 import Forge.Types
+import qualified Data.Text as T
 import System.Exit (die)
 import RIO.Directory (doesFileExist, renameFile)
 
@@ -27,8 +28,11 @@ fetchTemplate m = do
   case m of
     Nothing ->
       die
-        "Please specify a template name. See here for a list of templates: https://github.com/denibertovic/makefiles"
+        "Please specify a template name in the format 'myorg/templatename'. See here for a list of my default templates: https://github.com/denibertovic/makefiles."
     Just (MakefileTemplateName name) -> do
+      let (b', n') = case T.splitOn "/" name of
+                [_] -> (baseUrl, name)
+                [group, name'] -> (T.replace "denibertovic" group baseUrl, name')
       exists <- doesFileExist "Makefile"
       when exists (renameFile "Makefile" "Makefile.old")
-      downloadFile (baseUrl <> name <> ".makefile") "Makefile"
+      downloadFile (b' <> n' <> ".makefile") "Makefile"

@@ -1,13 +1,13 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.0.
+-- This file has been generated from package.yaml by hpack version 0.31.1.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: bf2a27076d7463195c402a8d368ede525d492b4d8faa79b54734c21729273817
+-- hash: d4f8ada68327efef0312b38894441114f4ef68003b0d24a2b0ec35d9d8ea43ac
 
 name:           forge
-version:        0.3.0.0
+version:        0.3.1.0
 description:    Please see the README on GitHub at <https://github.com/denibertovic/forge#readme>
 homepage:       https://github.com/denibertovic/forge#readme
 bug-reports:    https://github.com/denibertovic/forge/issues

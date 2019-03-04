@@ -12,10 +12,16 @@ import           Options.Applicative
 
 import           Forge.Github.Options (GithubOpts, githubOpts)
 import           Forge.Gitlab.Options (Env, GitlabOpts, gitlabOpts)
+import           Forge.Terraform.Options (TerraformOpts, terraformOpts)
+
 import Forge.Types
 import qualified Data.Text as T
 
-data ForgeCommand = Gitlab GitlabOpts | Github GithubOpts | Fetch (Maybe MakefileTemplateName)
+data ForgeCommand
+  = Gitlab GitlabOpts
+  | Github GithubOpts
+  | Fetch (Maybe MakefileTemplateName)
+  | Terraform TerraformOpts
 
 data ForgeOpts = ForgeOpts {
                    debug :: Bool
@@ -58,8 +64,14 @@ cmdGithub env = command "github" infos
           desc = progDesc "Github commands"
           options = Github <$> githubOpts env
 
+cmdTerraform :: Env -> Mod CommandFields ForgeCommand
+cmdTerraform env = command "tf" infos
+    where infos = info (options <**> helper) desc
+          desc = progDesc "Terraform commands"
+          options = Terraform <$> terraformOpts env
+
 forgeCmds :: Env -> Parser ForgeCommand
-forgeCmds env = subparser (cmdGitlab env <> cmdGithub env <> cmdFetch env)
+forgeCmds env = subparser (cmdGitlab env <> cmdGithub env <> cmdFetch env <> cmdTerraform env)
 
 forgeOpts :: Env -> Parser ForgeOpts
 forgeOpts env = ForgeOpts <$> debugOpt <*> (forgeCmds env)

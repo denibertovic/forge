@@ -7,6 +7,7 @@ import RIO
 
 import qualified Forge.Github.Lib as Github
 import qualified Forge.Gitlab.Lib as Gitlab
+import qualified Forge.Terraform.Lib as Terraform
 import Forge.HTTP (downloadFile)
 import Forge.Options
 import Forge.Types
@@ -20,6 +21,7 @@ entrypoint (ForgeOpts _ cmd) = do
     Gitlab opts -> Gitlab.entrypoint opts
     Github opts -> Github.entrypoint opts
     Fetch makefile -> fetchTemplate makefile
+    Terraform opts -> Terraform.entrypoint opts
 
 fetchTemplate :: Maybe MakefileTemplateName -> IO ()
 fetchTemplate m = do

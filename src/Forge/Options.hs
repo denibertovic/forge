@@ -13,6 +13,7 @@ import           Options.Applicative
 import           Forge.Github.Options (GithubOpts, githubOpts)
 import           Forge.Gitlab.Options (Env, GitlabOpts, gitlabOpts)
 import           Forge.Terraform.Options (TerraformOpts, terraformOpts)
+import           Forge.Firefox.Options (FirefoxOpts, firefoxOpts)
 
 import Forge.Types
 import qualified Data.Text as T
@@ -22,6 +23,7 @@ data ForgeCommand
   | Github GithubOpts
   | Fetch (Maybe MakefileTemplateName)
   | Terraform TerraformOpts
+  | Firefox FirefoxOpts
 
 data ForgeOpts = ForgeOpts {
                    debug :: Bool
@@ -70,13 +72,17 @@ cmdTerraform env = command "tf" infos
           desc = progDesc "Terraform commands"
           options = Terraform <$> terraformOpts env
 
+cmdFirefox :: Env -> Mod CommandFields ForgeCommand
+cmdFirefox env = command "firefox" infos
+    where infos = info (options <**> helper) desc
+          desc = progDesc "Firefox commands."
+          options = Firefox <$> firefoxOpts env
+
 forgeCmds :: Env -> Parser ForgeCommand
-forgeCmds env = subparser (cmdGitlab env <> cmdGithub env <> cmdFetch env <> cmdTerraform env)
+forgeCmds env = subparser (cmdGitlab env <> cmdGithub env <> cmdFetch env <> cmdTerraform env <> cmdFirefox env)
 
 forgeOpts :: Env -> Parser ForgeOpts
 forgeOpts env = ForgeOpts <$> debugOpt <*> (forgeCmds env)
 
 readMakefileTemplateName :: String -> Maybe MakefileTemplateName
 readMakefileTemplateName m = Just $ MakefileTemplateName $ T.pack m
-
-

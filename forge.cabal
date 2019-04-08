@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d4f8ada68327efef0312b38894441114f4ef68003b0d24a2b0ec35d9d8ea43ac
+-- hash: 16c38f5afee91923b1869e76528e8ece1d7eda83bb22a13e4983a92cd7a9df74
 
 name:           forge
 version:        0.3.1.0
@@ -36,6 +36,7 @@ library
     , bytestring
     , conduit
     , conduit-extra
+    , containers
     , directory
     , filemanip
     , filepath
@@ -43,6 +44,9 @@ library
     , http-client-tls
     , http-conduit
     , http-types
+    , ini
+    , microlens
+    , microlens-platform
     , optparse-applicative
     , pretty-simple
     , rio
@@ -50,8 +54,12 @@ library
     , text
     , typed-process
     , unix
+    , unordered-containers
     , yaml
   exposed-modules:
+      Forge.Firefox.Lib
+      Forge.Firefox.Options
+      Forge.Firefox.Types
       Forge.Github.Lib
       Forge.Github.Options
       Forge.Github.Types
@@ -82,6 +90,7 @@ executable forge
     , bytestring
     , conduit
     , conduit-extra
+    , containers
     , directory
     , filemanip
     , filepath
@@ -90,6 +99,9 @@ executable forge
     , http-client-tls
     , http-conduit
     , http-types
+    , ini
+    , microlens
+    , microlens-platform
     , optparse-applicative
     , pretty-simple
     , rio
@@ -97,6 +109,7 @@ executable forge
     , text
     , typed-process
     , unix
+    , unordered-containers
     , yaml
   other-modules:
       Paths_forge
@@ -115,6 +128,7 @@ test-suite forge-test
     , bytestring
     , conduit
     , conduit-extra
+    , containers
     , directory
     , filemanip
     , filepath
@@ -123,6 +137,9 @@ test-suite forge-test
     , http-client-tls
     , http-conduit
     , http-types
+    , ini
+    , microlens
+    , microlens-platform
     , optparse-applicative
     , pretty-simple
     , rio
@@ -130,6 +147,7 @@ test-suite forge-test
     , text
     , typed-process
     , unix
+    , unordered-containers
     , yaml
   other-modules:
       Paths_forge

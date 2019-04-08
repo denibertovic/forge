@@ -29,6 +29,8 @@ ghc-options:
 
 dependencies:
 - base >= 4.7 && < 5
+- microlens
+- microlens-platform
 - rio
 - text
 - bytestring
@@ -49,6 +51,9 @@ dependencies:
 - http-conduit
 - pretty-simple
 - typed-process
+- ini
+- containers
+- unordered-containers
 
 library:
   source-dirs: src

@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 16c38f5afee91923b1869e76528e8ece1d7eda83bb22a13e4983a92cd7a9df74
+-- hash: 714fcc57aa69e1e8a68268efdd7c9f01f915fd01977a1b34feedfc08fa9e2e87
 
 name:           forge
-version:        0.3.1.0
+version:        0.3.2.0
 description:    Please see the README on GitHub at <https://github.com/denibertovic/forge#readme>
 homepage:       https://github.com/denibertovic/forge#readme
 bug-reports:    https://github.com/denibertovic/forge/issues

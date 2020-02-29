@@ -4,17 +4,9 @@
 
 VERSION ?= $(shell grep "^version:" forge.cabal | cut -d " " -f9)
 
-## Run build
+## Build project with nix
 build:
-	@stack build
-
-## Run repl
-repl:
-	@stack repl
-
-## Run tests. Example RUN_INTEGRATION_TESTS=1 make test
-test:
-	@RUN_INTEGRATION_TESTS=1 stack test
+	@nix-build --attr project release.nix $(builders)
 
 ## Cut new release
 release:

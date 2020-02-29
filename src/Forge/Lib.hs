@@ -9,11 +9,12 @@ import qualified Forge.Github.Lib as Github
 import qualified Forge.Gitlab.Lib as Gitlab
 import qualified Forge.Terraform.Lib as Terraform
 import qualified Forge.Firefox.Lib as Firefox
+import qualified Forge.Dns.Lib as Dns
 import Forge.HTTP (downloadFile)
 import Forge.Options
 import Forge.Types
 import qualified Data.Text as T
-import System.Exit (die)
+import System.Exit (die, exitSuccess)
 import RIO.Directory (doesFileExist, renameFile)
 
 errMsg :: String
@@ -27,6 +28,7 @@ entrypoint (ForgeOpts _ cmd) = do
     Fetch makefile -> fetchTemplate makefile
     Terraform opts -> Terraform.entrypoint opts
     Firefox opts -> Firefox.entrypoint opts
+    Dns opts -> Dns.entrypoint opts
 
 fetchTemplate :: Maybe MakefileTemplateName -> IO ()
 fetchTemplate m = do

@@ -32,6 +32,7 @@ dependencies:
 - microlens
 - microlens-platform
 - rio
+- mtl
 - text
 - bytestring
 - yaml
@@ -54,6 +55,7 @@ dependencies:
 - ini
 - containers
 - unordered-containers
+- DOH
 
 library:
   source-dirs: src

@@ -14,6 +14,7 @@ import           Forge.Github.Options (GithubOpts, githubOpts)
 import           Forge.Gitlab.Options (Env, GitlabOpts, gitlabOpts)
 import           Forge.Terraform.Options (TerraformOpts, terraformOpts)
 import           Forge.Firefox.Options (FirefoxOpts, firefoxOpts)
+import           Forge.Dns.Options (DnsOpts, dnsOpts)
 
 import Forge.Types
 import qualified Data.Text as T
@@ -24,6 +25,7 @@ data ForgeCommand
   | Fetch (Maybe MakefileTemplateName)
   | Terraform TerraformOpts
   | Firefox FirefoxOpts
+  | Dns DnsOpts
 
 data ForgeOpts = ForgeOpts {
                    debug :: Bool
@@ -78,8 +80,14 @@ cmdFirefox env = command "firefox" infos
           desc = progDesc "Firefox commands."
           options = Firefox <$> firefoxOpts env
 
+cmdDns :: Env -> Mod CommandFields ForgeCommand
+cmdDns env = command "dns" infos
+    where infos = info (options <**> helper) desc
+          desc = progDesc "Dns commands."
+          options = Dns <$> dnsOpts env
+
 forgeCmds :: Env -> Parser ForgeCommand
-forgeCmds env = subparser (cmdGitlab env <> cmdGithub env <> cmdFetch env <> cmdTerraform env <> cmdFirefox env)
+forgeCmds env = subparser (cmdGitlab env <> cmdGithub env <> cmdFetch env <> cmdTerraform env <> cmdFirefox env <> cmdDns env)
 
 forgeOpts :: Env -> Parser ForgeOpts
 forgeOpts env = ForgeOpts <$> debugOpt <*> (forgeCmds env)

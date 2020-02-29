@@ -4,17 +4,9 @@
 
 VERSION ?= $(shell grep "^version:" forge.cabal | cut -d " " -f9)
 
-## Run build
+## Build project
 build:
 	@stack build
-
-## Run repl
-repl:
-	@stack repl
-
-## Run tests. Example RUN_INTEGRATION_TESTS=1 make test
-test:
-	@RUN_INTEGRATION_TESTS=1 stack test
 
 ## Cut new release
 release:

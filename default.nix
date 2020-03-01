@@ -18,9 +18,9 @@ let
   # Pin nixpkgs version
   # By default to the one `static-haskell-nix` provides, but you may also give
   # your own as long as it has the necessary patches, using e.g.
-  #     pkgs = import (fetchTarball https://github.com/nh2/nixpkgs/archive/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa123.tar.gz) {};
+  pkgs = import (fetchTarball https://github.com/nixos/nixpkgs/archive/ca3531850844e185d483fb878fcd00c6b44069e5.tar.gz) {};
   # pkgs = import "${static-haskell-nix}/nixpkgs.nix";
-  pkgs = import (import ./nix/sources.nix).nixpkgs {};
+  # pkgs = import (import ./nix/sources.nix).nixpkgs {};
 
 
   stack2nix-script = import "${static-haskell-nix}/static-stack2nix-builder/stack2nix-script.nix" {

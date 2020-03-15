@@ -1,13 +1,13 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.1.
+-- This file has been generated from package.yaml by hpack version 0.31.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 714fcc57aa69e1e8a68268efdd7c9f01f915fd01977a1b34feedfc08fa9e2e87
+-- hash: d00b480551c3de92dacf1e846b85371281d7da11aeac8780f259eb7ab1e42bcd
 
 name:           forge
-version:        0.3.2.0
+version:        0.3.3.0
 description:    Please see the README on GitHub at <https://github.com/denibertovic/forge#readme>
 homepage:       https://github.com/denibertovic/forge#readme
 bug-reports:    https://github.com/denibertovic/forge/issues
@@ -31,7 +31,8 @@ library
   default-extensions: NoImplicitPrelude
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
   build-depends:
-      aeson
+      DOH
+    , aeson
     , base >=4.7 && <5
     , bytestring
     , conduit
@@ -47,6 +48,7 @@ library
     , ini
     , microlens
     , microlens-platform
+    , mtl
     , optparse-applicative
     , pretty-simple
     , rio
@@ -57,6 +59,9 @@ library
     , unordered-containers
     , yaml
   exposed-modules:
+      Forge.Dns.DigitalOcean
+      Forge.Dns.Lib
+      Forge.Dns.Options
       Forge.Firefox.Lib
       Forge.Firefox.Options
       Forge.Firefox.Types
@@ -85,7 +90,8 @@ executable forge
   default-extensions: NoImplicitPrelude
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      aeson
+      DOH
+    , aeson
     , base >=4.7 && <5
     , bytestring
     , conduit
@@ -102,6 +108,7 @@ executable forge
     , ini
     , microlens
     , microlens-platform
+    , mtl
     , optparse-applicative
     , pretty-simple
     , rio
@@ -123,7 +130,8 @@ test-suite forge-test
   default-extensions: NoImplicitPrelude
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      aeson
+      DOH
+    , aeson
     , base >=4.7 && <5
     , bytestring
     , conduit
@@ -140,6 +148,7 @@ test-suite forge-test
     , ini
     , microlens
     , microlens-platform
+    , mtl
     , optparse-applicative
     , pretty-simple
     , rio

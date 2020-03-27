@@ -1,12 +1,17 @@
-.PHONY: build repl test release help
+.PHONY: build repl test release help static
 
 .DEFAULT_GOAL = help
 
 VERSION ?= $(shell grep "^version:" forge.cabal | cut -d " " -f9)
+STATIC_BUILD_SCRIPT ?= $(shell nix-build --no-link -A fullBuildScript)
 
 ## Build project
 build:
 	@stack build
+
+## Build static binary with nix
+static:
+	@$(STATIC_BUILD_SCRIPT)
 
 ## Cut new release
 release:

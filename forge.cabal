@@ -1,13 +1,13 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.35.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d00b480551c3de92dacf1e846b85371281d7da11aeac8780f259eb7ab1e42bcd
+-- hash: b04163c67ac2160169f01fae6ec61afb662851def4a966d6d71e41cc54995e79
 
 name:           forge
-version:        0.3.3.0
+version:        0.3.3.1
 description:    Please see the README on GitHub at <https://github.com/denibertovic/forge#readme>
 homepage:       https://github.com/denibertovic/forge#readme
 bug-reports:    https://github.com/denibertovic/forge/issues
@@ -28,7 +28,8 @@ source-repository head
 library
   hs-source-dirs:
       src
-  default-extensions: NoImplicitPrelude
+  default-extensions:
+      NoImplicitPrelude
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
   build-depends:
       DOH
@@ -87,7 +88,8 @@ executable forge
   main-is: Main.hs
   hs-source-dirs:
       app
-  default-extensions: NoImplicitPrelude
+  default-extensions:
+      NoImplicitPrelude
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       DOH
@@ -127,7 +129,8 @@ test-suite forge-test
   main-is: Spec.hs
   hs-source-dirs:
       test
-  default-extensions: NoImplicitPrelude
+  default-extensions:
+      NoImplicitPrelude
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       DOH

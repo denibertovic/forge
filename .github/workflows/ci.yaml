@@ -89,7 +89,7 @@ jobs:
     # run: echo ::set-env name=RUNNER_OS::${${{ runner.os }},,}
     # got error: name=RUNNER_OS::${macOS,,}: bad substitution
     - name: Create release artifact
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
       run: |
         mkdir release
         cd release

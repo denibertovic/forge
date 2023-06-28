@@ -6,7 +6,7 @@ on:
     branches:
       - '*'
     tags:
-      - 'v*.*.*.*' # Push events to matching v1.2.3.4
+      - '*.*.*.*' # Push events to matching v1.2.3.4
 jobs:
   stack:
     name: Build using stack

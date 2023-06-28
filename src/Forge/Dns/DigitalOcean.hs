@@ -27,6 +27,14 @@ import Prelude (print)
 client :: Text -> Client
 client key = Client $ encodeUtf8 key
 
+removeCacheFile :: FilePath -> IO ()
+removeCacheFile cacheFile =
+    removeFile cacheFile `catch` handleError
+  where handleError e
+          | isDoesNotExistError e = return ()
+          | otherwise = throwIO e
+
+
 updateDns :: FilePath -> (BS.ByteString -> IO (Either String Text)) -> [Text] -> Maybe Text -> IO ()
 updateDns cacheFile checkCache names mip = do
   key <- lookupSettingThrow "DO_TOKEN"
@@ -49,7 +57,8 @@ updateDns cacheFile checkCache names mip = do
             -- NOTE: this is a hack until I implement a better caching scheme based on each
             -- updated domain. For now we just delete the file so that the second update
             -- will re-try updating all the domains
-            removeFile cacheFile
+            -- TODO: This fails if there is no cache file
+            removeCacheFile cacheFile
             die $ show err
           Right _ -> do
             BS.writeFile cacheFile (encodeUtf8 newIp)
